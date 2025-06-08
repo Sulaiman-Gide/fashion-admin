@@ -1,103 +1,217 @@
-import Image from "next/image";
+"use client";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { auth } from "@/app/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { uploadImageToCloudinary } from "@/app/utils/cloudinary";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { db } from "@/app/lib/firebase";
 
-export default function Home() {
+export default function UploadPage() {
+  const router = useRouter();
+  const [loadingImages, setLoadingImages] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const categoryOptions = [
+    "All",
+    "Men",
+    "Women",
+    "Kids",
+    "Unisex",
+    "Accessories",
+    "Shoes",
+    "Sale",
+  ];
+
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    price: "",
+    category: "",
+    subcategories: "",
+    gender: "unisex",
+    brand: "",
+    tags: "",
+    stock: "",
+    images: [] as string[],
+  });
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) router.push("/login");
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleImageUpload = async (files: FileList) => {
+    setLoadingImages(true);
+    const selectedFiles = [...files].slice(0, 3);
+    const uploads = await Promise.all(
+      selectedFiles.map((file) => uploadImageToCloudinary(file))
+    );
+    setForm((prev) => ({ ...prev, images: uploads }));
+    setLoadingImages(false);
+  };
+
+  const submitProduct = async () => {
+    if (
+      !form.name ||
+      !form.description ||
+      !form.price ||
+      !form.category ||
+      !form.gender ||
+      !form.brand ||
+      !form.stock ||
+      form.images.length !== 3
+    ) {
+      alert("Please fill all required fields and upload 3 images.");
+      return;
+    }
+
+    setSubmitting(true);
+
+    await addDoc(collection(db, "products"), {
+      name: form.name,
+      description: form.description,
+      images: form.images,
+      price: parseFloat(form.price),
+      category: form.category.toLowerCase(),
+      subcategories: form.subcategories
+        .split(",")
+        .map((x) => x.trim().toLowerCase()),
+      gender: form.gender,
+      brand: form.brand,
+      rating: 0,
+      createdAt: serverTimestamp(),
+      tags: form.tags.split(",").map((x) => x.trim().toLowerCase()),
+      stock: parseInt(form.stock),
+    });
+
+    setSubmitting(false);
+    alert("Product uploaded!");
+    setForm({
+      name: "",
+      description: "",
+      price: "",
+      category: "",
+      subcategories: "",
+      gender: "unisex",
+      brand: "",
+      tags: "",
+      stock: "",
+      images: [],
+    });
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-gray-100 py-10 px-4">
+      <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-8 space-y-6">
+        <h1 className="text-3xl font-bold text-gray-800">Upload New Product</h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input
+            placeholder="Product Name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className="border rounded-lg px-4 py-2 text-sm text-black"
+          />
+          <input
+            placeholder="Brand"
+            value={form.brand}
+            onChange={(e) => setForm({ ...form, brand: e.target.value })}
+            className="border rounded-lg px-4 py-2 text-sm text-black"
+          />
+          <input
+            type="number"
+            placeholder="Price (₦)"
+            value={form.price}
+            onChange={(e) => setForm({ ...form, price: e.target.value })}
+            className="border rounded-lg px-4 py-2 text-sm text-black"
+          />
+          <input
+            type="number"
+            placeholder="Stock Quantity"
+            value={form.stock}
+            onChange={(e) => setForm({ ...form, stock: e.target.value })}
+            className="border rounded-lg px-4 py-2 text-sm text-black"
+          />
+          <input
+            placeholder="Category (e.g. hoodie)"
+            value={form.category}
+            onChange={(e) => setForm({ ...form, category: e.target.value })}
+            className="border rounded-lg px-4 py-2 text-sm text-black"
+          />
+          <select
+            value={form.category}
+            onChange={(e) => setForm({ ...form, category: e.target.value })}
+            className="border rounded-lg px-4 py-2 text-sm text-black"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <option value="">Select Category</option>
+            {categoryOptions.map((option) => (
+              <option key={option} value={option.toLowerCase()}>
+                {option}
+              </option>
+            ))}
+          </select>
+          <input
+            placeholder="Subcategories (comma-separated)"
+            value={form.subcategories}
+            onChange={(e) =>
+              setForm({ ...form, subcategories: e.target.value })
+            }
+            className="text-sm text-black border rounded-lg px-4 py-2 col-span-full"
+          />
+          <input
+            placeholder="Tags (comma-separated)"
+            value={form.tags}
+            onChange={(e) => setForm({ ...form, tags: e.target.value })}
+            className="text-sm text-black border rounded-lg px-4 py-2 col-span-full"
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        <textarea
+          placeholder="Product Description"
+          value={form.description}
+          onChange={(e) => setForm({ ...form, description: e.target.value })}
+          className="w-full text-sm text-black border rounded-lg px-4 py-2 h-28 resize-none"
+        />
+
+        <div>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => handleImageUpload(e.target.files!)}
+            className="block text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
+              file:rounded-full file:border-0
+              file:text-sm file:font-semibold
+              file:bg-indigo-50 file:text-indigo-700
+              hover:file:bg-indigo-100"
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          {loadingImages && (
+            <p className="text-sm mt-2 text-gray-500">Uploading images...</p>
+          )}
+          {form.images.length > 0 && (
+            <div className="grid grid-cols-3 gap-3 mt-4">
+              {form.images.map((img, i) => (
+                <img
+                  key={i}
+                  src={img}
+                  className="w-full h-32 object-cover rounded-lg"
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <button
+          onClick={submitProduct}
+          disabled={submitting}
+          className="w-full bg-indigo-600 text-white py-3 text-lg rounded-lg font-[400] hover:bg-indigo-700 disabled:opacity-50"
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          {submitting ? "Submitting..." : "Submit Product"}
+        </button>
+      </div>
     </div>
   );
 }
