@@ -4,7 +4,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { auth } from "@/app/lib/firebase";
 import LoadingSpinner from "./LoadingSpinner";
 
-const publicPaths = ['/login'];
+const publicPaths = ["/login"];
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -14,11 +14,11 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       const isPublicPath = publicPaths.includes(pathname);
-      
+
       if (!user && !isPublicPath) {
-        router.push('/login');
+        router.push("/login");
       } else if (user && isPublicPath) {
-        router.push('/');
+        router.push("/");
       } else {
         setLoading(false);
       }
