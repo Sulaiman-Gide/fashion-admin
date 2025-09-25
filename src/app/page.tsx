@@ -4,8 +4,7 @@ import { useRouter } from "next/navigation";
 import { auth } from "@/app/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { uploadImageToCloudinary } from "@/app/utils/cloudinary";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/app/lib/firebase";
+import { supabase } from "@/app/lib/supabase";
 import CustomToast from "@/app/components/CustomToast";
 
 export default function UploadPage() {
@@ -34,14 +33,25 @@ export default function UploadPage() {
     "Sale",
   ];
 
-  const [form, setForm] = useState({
+  interface ProductForm {
+    name: string;
+    description: string;
+    price: string;
+    category: string;
+    subcategories: string;
+    tags: string;
+    gender: string;
+    stock: string;
+    images: string[];
+  }
+
+  const [form, setForm] = useState<ProductForm>({
     name: "",
     description: "",
     price: "",
     category: "",
     subcategories: "",
     gender: "unisex",
-    brand: "",
     tags: "",
     stock: "",
     images: [] as string[],
@@ -52,7 +62,7 @@ export default function UploadPage() {
       if (!user) router.push("/login");
     });
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
   const handleImageUpload = async (files: FileList) => {
     setLoadingImages(true);
@@ -70,8 +80,6 @@ export default function UploadPage() {
       !form.description ||
       !form.price ||
       !form.category ||
-      !form.gender ||
-      !form.brand ||
       !form.stock ||
       form.images.length !== 3
     ) {
@@ -82,22 +90,28 @@ export default function UploadPage() {
     setSubmitting(true);
 
     try {
-      await addDoc(collection(db, "products"), {
-        name: form.name,
-        description: form.description,
-        images: form.images,
-        price: parseFloat(form.price),
-        category: form.category.toLowerCase(),
-        subcategories: form.subcategories
-          .split(",")
-          .map((x) => x.trim().toLowerCase()),
-        gender: form.gender,
-        brand: form.brand,
-        rating: 0,
-        createdAt: serverTimestamp(),
-        tags: form.tags.split(",").map((x) => x.trim().toLowerCase()),
-        stock: parseInt(form.stock),
-      });
+      const { data, error } = await supabase
+        .from("products")
+        .insert([
+          {
+            name: form.name,
+            description: form.description,
+            images: form.images,
+            price: parseFloat(form.price),
+            category: form.category.toLowerCase(),
+            sizes: form.subcategories
+              .split(",")
+              .map((x) => x.trim().toLowerCase()),
+            colors: form.tags.split(",").map((x) => x.trim().toLowerCase()),
+            stock: parseInt(form.stock),
+            gender: form.gender,
+            view_count: 0,
+            purchase_count: 0,
+          },
+        ])
+        .select();
+
+      if (error) throw error;
 
       setForm({
         name: "",
@@ -106,7 +120,6 @@ export default function UploadPage() {
         category: "",
         subcategories: "",
         gender: "unisex",
-        brand: "",
         tags: "",
         stock: "",
         images: [],
@@ -115,6 +128,7 @@ export default function UploadPage() {
       showToast("Product uploaded!", "success");
     } catch (error) {
       showToast("Upload failed. Please try again.", "error");
+      console.log(error);
     }
 
     setSubmitting(false);
@@ -128,7 +142,7 @@ export default function UploadPage() {
         visible={toast.visible}
         onHide={() => setToast((prev) => ({ ...prev, visible: false }))}
       />
-      <div className="min-h-screen bg-gray-800 py-10 px-4">
+      <div className="min-h-screen bg-gray-50 py-10 px-4">
         <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-8 space-y-6">
           <h1 className="text-2xl font-bold text-gray-800">
             Upload New Product
@@ -147,22 +161,6 @@ export default function UploadPage() {
                 placeholder="Product Name"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="border rounded-lg px-4 py-2 text-sm text-black"
-              />
-            </div>
-
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="brand"
-                className="text-sm font-medium text-gray-700"
-              >
-                Brand
-              </label>
-              <input
-                id="brand"
-                placeholder="Brand"
-                value={form.brand}
-                onChange={(e) => setForm({ ...form, brand: e.target.value })}
                 className="border rounded-lg px-4 py-2 text-sm text-black"
               />
             </div>
@@ -199,6 +197,26 @@ export default function UploadPage() {
                 onChange={(e) => setForm({ ...form, stock: e.target.value })}
                 className="border rounded-lg px-4 py-2 text-sm text-black"
               />
+            </div>
+
+            <div className="flex flex-col space-y-2">
+              <label
+                htmlFor="gender"
+                className="text-sm font-medium text-gray-700"
+              >
+                Gender
+              </label>
+              <select
+                id="gender"
+                value={form.gender}
+                onChange={(e) => setForm({ ...form, gender: e.target.value })}
+                className="border rounded-lg px-4 py-2 text-sm text-black"
+              >
+                <option value="men">Men</option>
+                <option value="women">Women</option>
+                <option value="kids">Kids</option>
+                <option value="unisex">Unisex</option>
+              </select>
             </div>
 
             <div className="flex flex-col space-y-2">
@@ -241,7 +259,7 @@ export default function UploadPage() {
               />
             </div>
 
-            <div className="col-span-full flex flex-col space-y-2">
+            <div className="flex flex-col space-y-2">
               <label
                 htmlFor="tags"
                 className="text-sm font-medium text-gray-700"
