@@ -1,21 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "./components/Navbar";
+import AuthGuard from "./components/AuthGuard";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Fashion Admin",
-  description: "Admin dashboard for managing fashion products",
+  description: "Admin panel for managing fashion products",
 };
 
 export default function RootLayout({
@@ -25,11 +17,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 min-h-screen`}
-      >
-        <Navbar />
-        <main>{children}</main>
+      <body className={inter.className}>
+        <AuthGuard>{children}</AuthGuard>
       </body>
     </html>
   );
