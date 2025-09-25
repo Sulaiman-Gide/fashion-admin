@@ -35,8 +35,6 @@ export default function CustomToast({
     );
 
   const textColor = type === "success" ? "text-green-600" : "text-red-600";
-  const borderColor =
-    type === "success" ? "border-green-600" : "border-red-600";
 
   return (
     <AnimatePresence>
