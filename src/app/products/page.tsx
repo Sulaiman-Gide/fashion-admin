@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -67,14 +69,25 @@ export default function ProductsPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-            <p className="mt-1 text-sm text-gray-500">Manage your product inventory</p>
+            <p className="mt-1 text-sm text-gray-500">
+              Manage your product inventory
+            </p>
           </div>
           <button
             onClick={() => router.push("/")}
             className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 -ml-1" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-1.5 -ml-1"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                clipRule="evenodd"
+              />
             </svg>
             Add New Product
           </button>
@@ -87,16 +100,28 @@ export default function ProductsPage() {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th
+                        scope="col"
+                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
                         Product
                       </th>
-                      <th scope="col" className="hidden md:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th
+                        scope="col"
+                        className="hidden md:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
                         Category
                       </th>
-                      <th scope="col" className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th
+                        scope="col"
+                        className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
                         Price
                       </th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th
+                        scope="col"
+                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
                         Status
                       </th>
                       <th scope="col" className="relative px-4 py-3">
@@ -107,8 +132,12 @@ export default function ProductsPage() {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {products.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-500">
-                          No products found. Add your first product to get started.
+                        <td
+                          colSpan={5}
+                          className="px-4 py-8 text-center text-sm text-gray-500"
+                        >
+                          No products found. Add your first product to get
+                          started.
                         </td>
                       </tr>
                     ) : (
@@ -125,8 +154,18 @@ export default function ProductsPage() {
                                   />
                                 ) : (
                                   <div className="h-10 w-10 rounded-md bg-gray-200 flex items-center justify-center">
-                                    <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    <svg
+                                      className="h-6 w-6 text-gray-400"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                      />
                                     </svg>
                                   </div>
                                 )}
@@ -136,9 +175,13 @@ export default function ProductsPage() {
                                   {product.name}
                                 </div>
                                 <div className="text-xs text-gray-500 flex items-center">
-                                  <span className="capitalize">{product.gender}</span>
+                                  <span className="capitalize">
+                                    {product.gender}
+                                  </span>
                                   <span className="mx-1">•</span>
-                                  <span className="md:hidden">₦{product.price?.toLocaleString()}</span>
+                                  <span className="md:hidden">
+                                    ₦{product.price?.toLocaleString()}
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -148,7 +191,8 @@ export default function ProductsPage() {
                               {product.category}
                             </div>
                             <div className="text-xs text-gray-500">
-                              {product.sizes?.slice(0, 2).join(", ")}{product.sizes?.length > 2 ? '...' : ''}
+                              {product.sizes?.slice(0, 2).join(", ")}
+                              {product.sizes?.length > 2 ? "..." : ""}
                             </div>
                           </td>
                           <td className="hidden sm:table-cell px-4 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
@@ -168,7 +212,9 @@ export default function ProductsPage() {
                           <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div className="flex justify-end space-x-2">
                               <button
-                                onClick={() => router.push(`/edit-product/${product.id}`)}
+                                onClick={() =>
+                                  router.push(`/edit-product/${product.id}`)
+                                }
                                 className="text-indigo-600 hover:text-indigo-900 p-1 rounded-full hover:bg-indigo-50"
                                 title="Edit"
                               >
@@ -201,7 +247,8 @@ export default function ProductsPage() {
         {products.length > 0 && (
           <div className="mt-4 flex items-center justify-between text-sm text-gray-700">
             <div className="hidden sm:block">
-              Showing <span className="font-medium">1</span> to <span className="font-medium">{products.length}</span> of{' '}
+              Showing <span className="font-medium">1</span> to{" "}
+              <span className="font-medium">{products.length}</span> of{" "}
               <span className="font-medium">{products.length}</span> results
             </div>
             <div className="flex-1 sm:flex-none flex justify-between sm:justify-end space-x-4">

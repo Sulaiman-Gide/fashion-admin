@@ -90,7 +90,7 @@ export default function UploadPage() {
     setSubmitting(true);
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("products")
         .insert([
           {

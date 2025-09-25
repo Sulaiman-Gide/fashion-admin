@@ -1,5 +1,6 @@
-"use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
+"use client";
 import { useState, KeyboardEvent } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -26,6 +27,7 @@ export default function AdminLogin() {
       router.push("/");
     } catch (err: any) {
       setError("Invalid email or password");
+      console.log(err);
     } finally {
       setLoading(false);
     }
