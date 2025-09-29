@@ -46,11 +46,8 @@ export default function AdminLogin() {
           <h1 className="text-3xl font-extrabold text-gray-900">
             Welcome Back
           </h1>
-          {/* <p className="mt-2 text-sm text-gray-600">
-            Sign in to your admin account 
-          </p> */}
           <p className="mt-2 text-sm text-gray-600">
-            Sign in to your account fine girl 😂
+            Sign in to your admin account
           </p>
         </div>
 
