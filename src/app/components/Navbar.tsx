@@ -73,6 +73,14 @@ export default function Navbar() {
                 >
                   View Products
                 </Link>
+                <Link
+                  href="/orders"
+                  className={`${isActive(
+                    "/orders"
+                  )} px-3 py-2 rounded-md text-sm font-medium`}
+                >
+                  Orders
+                </Link>
               </div>
             </div>
           </div>
@@ -133,6 +141,16 @@ export default function Navbar() {
             >
               View Products
             </Link>
+            <Link
+              href="/orders"
+              onClick={() => setIsMenuOpen(false)}
+              className={`${isActive(
+                "/orders"
+              )} block px-3 py-2 rounded-md text-base font-medium`}
+            >
+              Orders
+            </Link>
+
             <button
               onClick={() => {
                 handleLogout();
